@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dicom Viewer</title>
+    <style>
+        #dicomImageContainer {
+            background-color: blue;
+            height: 400px;
+        }
+    </style>
+</head>
+<body>
+    <div class="col-md-6">
+        <div>
+            <input type="file" id="fileInput" />
+        </div>
+        <div id="dicomImageContainer">
+            <div id="dicomImage"></div>
+        </div>
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const fileInput = document.getElementById("fileInput");
+            const dicomImageContainer = document.getElementById("dicomImage");
+
+            fileInput.addEventListener("change", handleFileChange);
+
+            function handleFileChange(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    displayDicom(file);
+                }
+            }
+
+            function displayDicom(file) {
+                const reader = new FileReader();
+
+                reader.onload = function () {
+                    const arrayBuffer = reader.result;
+                    const byteArray = new Uint8Array(arrayBuffer);
+
+                    // Simulate DICOM processing
+                    // Replace this with your actual DICOM processing logic
+                    const image = processDicom(byteArray);
+
+                    dicomImageContainer.innerHTML = ""; // Clear previous image
+                    dicomImageContainer.appendChild(image);
+                };
+
+                reader.readAsArrayBuffer(file);
+            }
+
+            function processDicom(byteArray) {
+                // Simulated image creation
+                const img = new Image();
+                img.src = "src/main/resources/templates/dicom/exm.dcm"; // Replace with the actual image source
+                img.style.maxWidth = "100%";
+                return img;
+            }
+        });
+    </script>
+</body>
+</html>

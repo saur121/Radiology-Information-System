@@ -1,0 +1,121 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="ISO-8859-1">
+<title>Patient's List</title>
+<link rel="stylesheet"
+	href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+	integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+	crossorigin="anonymous">
+	
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+</head>
+
+ <body>
+	<div class="container my-2">
+	<h1>Patient's List</h1>
+	
+<div class="text-right"> <!-- Adding a class to align contents to the right -->
+    <a th:href="@{/user/patient}" class="btn btn-primary btn-sm mb-3">Add Patient</a>
+    	                   <a href = "/logout">
+	                       <button class="btn btn-primary btn-sm mb-3">Logout</button>                       
+	                       </a>	
+</div>
+	
+   <div class = "search-container my-3">
+		
+		<input onkeyup="search()" id ="search-input" type="text" class="form-control" placeholder="Search Patients"/>  
+		 
+		 <div class="search-result">
+		       
+		 </div> 
+	 </div>
+	
+	<table border="1" class = "table table-striped table-responsive-md">
+			<thead>
+				<tr>
+                <th>
+                  <a th:href="@{'/user/page/' + ${currentPage} + '?sortField=id&sortDir=' + ${reverseSortDir}}">
+                        <span th:class="${sortField == 'id' ? (sortDir == 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down') : 'fas fa-sort'}"></span>
+                        ID
+                    </a>
+                </th>
+                <th>
+                    <a th:href="@{'/user/page/' + ${currentPage} + '?sortField=patientName&sortDir=' + ${reverseSortDir}}">
+                        <span th:class="${sortField == 'patientName' ? (sortDir == 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down') : 'fas fa-sort'}"></span>
+                        Patient Name
+                    </a>
+                </th>
+					<th>Gender</th>
+					<th>
+                         Email
+					</th>
+					
+					  <th>Date of Birth</th>
+					 
+		             <th>DICOM</th>
+		             
+		             <th>
+                  <a th:href="@{'/user/page/' + ${currentPage} + '?sortField=uploadDate&sortDir=' + ${reverseSortDir}}">
+                        <span th:class="${sortField == 'uploadDate' ? (sortDir == 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down') : 'fas fa-sort'}"></span>
+                        Upload Date
+                    </a>
+					 </th>
+					
+					<th> Actions </th>
+				</tr>
+			</thead>	
+		   <tbody>
+			  <tr th:each="data : ${listData}">
+				  <td th:text="${data.id}"></td>
+				  <td th:text="${data.patientName}"></td>
+				  <td th:text="${data.gender}"></td>
+				  <td th:text="${data.email}"></td>
+				  <td th:text="${data.dateOfBirth}"></td>
+				  
+			 <td>
+             	 <a th:href="@{/user/fupload/{id}(id=${data.id})}" class="btn btn-primary">File Status</a>
+         <span th:if="${data.fileUploaded}" style="color: green;">&#10004;</span>
+        <span th:unless="${data.fileUploaded}" style="color: red;">&#10008;</span>        
+			  </td>
+			  
+				  <td th:text="${data.uploadDate}"></td>			  
+			  
+					<td> <a th:href="@{/user/update/{id}(id=${data.id})}" class="btn btn-primary">Update</a>
+					    <a th:href="@{/user/delete/{id}(id=${data.id})}" class="btn btn-danger">Delete</a>
+					</td>
+				  
+			  </tr>
+		  </tbody>        
+	</table>
+		<div th:if = "${totalPages > 1}">
+			<div class = "row col-sm-10">
+				<div class = "col-sm-2">
+					Total Rows: [[${totalItems}]] 
+				</div>
+				<div class = "col-sm-1">
+					<span th:each="i: ${#numbers.sequence(1, totalPages)}">
+						<a th:if="${currentPage != i}" th:href="@{'/page/' + ${i}+ '?sortField=' + ${sortField} + '&sortDir=' + ${sortDir}}">[[${i}]]</a>
+						<span th:unless="${currentPage != i}">[[${i}]]</span>  &nbsp; &nbsp;
+					</span>
+				</div>
+				<div class = "col-sm-1">
+					<a th:if="${currentPage < totalPages}" th:href="@{'/user/page/' + ${currentPage + 1}+ '?sortField=' + ${sortField} + '&sortDir=' + ${sortDir}}">Next</a>
+					<span th:unless="${currentPage < totalPages}">Next</span>
+				</div>
+				
+				 <div class="col-sm-1">
+    				<a th:if="${currentPage < totalPages}" th:href="@{'/user/page/' + ${totalPages}+ '?sortField=' + ${sortField} + '&sortDir=' + ${sortDir}}">Last</a>
+					<span th:unless="${currentPage < totalPages}">Last</span>
+   				 </div>
+			</div>
+		</div>
+	</div>	  
+ </body>
+	
+</html>

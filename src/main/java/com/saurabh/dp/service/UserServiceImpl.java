@@ -3,12 +3,11 @@ package com.saurabh.dp.service;
 import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
- //import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.saurabh.dp.repository.*;
 import com.saurabh.dp.model.UserDtls;
-
 
 // Implementing the methods of UserService here
 
@@ -21,8 +20,8 @@ public class UserServiceImpl implements UserService {
 	
 	
 	// For password encryption
-	//@Autowired
-//	private BCryptPasswordEncoder passwordEncode;
+	@Autowired
+	private BCryptPasswordEncoder passwordEncode;  
 	
 	// New user is created here
 	
@@ -30,7 +29,7 @@ public class UserServiceImpl implements UserService {
 	public UserDtls createUser(UserDtls user) {
 		
 		
-	//	user.setPassword(passwordEncode.encode(user.getPassword()));
+		user.setPassword(passwordEncode.encode(user.getPassword()));
 		user.setRole("ROLE_USER");
 		
 		return userRepo.save(user);

@@ -14,22 +14,52 @@
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
+<style>
+    /* Custom CSS for center-aligning the heading */
+    .center-heading {
+        text-align: center;
+        margin-top: 20px; /* Adjust the margin-top as needed */
+    }
+</style>
+
 </head>
 
  <body>
+	
+ <div th:if="${error}" class="alert alert-danger">
+    <p th:text="${error}"></p>
+</div>
+	 
+	 
 	<div class="container my-2">
-	<h1>Patient's List</h1>
+	<h1 class="center-heading">Patient's List</h1>
 	
 <div class="text-right"> <!-- Adding a class to align contents to the right -->
     <a th:href="@{/user/patient}" class="btn btn-primary btn-sm mb-3">Add Patient</a>
     	                   <a href = "/logout">
-	                       <button class="btn btn-primary btn-sm mb-3">Logout</button>                       
+	                       <button class="btn btn-primary btn-sm mb-3">Log Out</button>                       
 	                       </a>	
 </div>
 	
    <div class = "search-container my-3">
-		
-		<input onkeyup="search()" id ="search-input" type="text" class="form-control" placeholder="Search Patients"/>  
+		        
+    <div class="row">
+        <div class="col">
+            <input onkeyup="search()" id="search-patientName" type="text" class="form-control" placeholder="Search by Patient Name"/>
+        </div>
+        <div class="col">
+            <input onkeyup="search()" id="search-id" type="text" class="form-control" placeholder="Search by Patient ID"/>
+        </div>
+        <div class="col">
+            <input onkeyup="search()" id="search-email" type="text" class="form-control" placeholder="Search by Email Address"/>
+        </div>
+        
+         <div class="col">
+            <button onclick="clearFilters()" class="btn btn-secondary">Clear</button>
+            <button onclick="resetFilters()" class="btn btn-primary">Reset</button>
+        </div>
+        
+    </div>
 		 
 		 <div class="search-result">
 		       
@@ -42,7 +72,7 @@
                 <th>
                   <a th:href="@{'/user/page/' + ${currentPage} + '?sortField=id&sortDir=' + ${reverseSortDir}}">
                         <span th:class="${sortField == 'id' ? (sortDir == 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down') : 'fas fa-sort'}"></span>
-                        ID
+                        Id
                     </a>
                 </th>
                 <th>
@@ -58,7 +88,7 @@
 					
 					  <th>Date of Birth</th>
 					 
-		             <th>DICOM</th>
+		             <th>Dicom</th>
 		             
 		             <th>
                   <a th:href="@{'/user/page/' + ${currentPage} + '?sortField=uploadDate&sortDir=' + ${reverseSortDir}}">
@@ -79,7 +109,7 @@
 				  <td th:text="${data.dateOfBirth}"></td>
 				  
 			 <td>
-             	 <a th:href="@{/user/fupload/{id}(id=${data.id})}" class="btn btn-primary">File Status</a>
+             	 <a th:href="@{/user/fupload/{id}(id=${data.id})}" class="btn btn-primary">Status</a>
          <span th:if="${data.fileUploaded}" style="color: green;">&#10004;</span>
         <span th:unless="${data.fileUploaded}" style="color: red;">&#10008;</span>        
 			  </td>
@@ -100,7 +130,7 @@
 				</div>
 				<div class = "col-sm-1">
 					<span th:each="i: ${#numbers.sequence(1, totalPages)}">
-						<a th:if="${currentPage != i}" th:href="@{'/page/' + ${i}+ '?sortField=' + ${sortField} + '&sortDir=' + ${sortDir}}">[[${i}]]</a>
+						<a th:if="${currentPage != i}" th:href="@{'/user/page/' + ${i}+ '?sortField=' + ${sortField} + '&sortDir=' + ${sortDir}}">[[${i}]]</a>
 						<span th:unless="${currentPage != i}">[[${i}]]</span>  &nbsp; &nbsp;
 					</span>
 				</div>
@@ -115,7 +145,51 @@
    				 </div>
 			</div>
 		</div>
-	</div>	  
- </body>
+	</div>	
 	
+	
+	  <script>
+		  
+		  
+      // JavaScript function to clear filters    
+    function clearFilters() {
+        document.getElementById('search-patientName').value = '';
+        document.getElementById('search-id').value = '';
+        document.getElementById('search-email').value = '';
+    }
+
+    // JavaScript function to reset filters
+    function resetFilters() {
+        document.getElementById('search-patientName').value = '';
+        document.getElementById('search-id').value = '';
+        document.getElementById('search-email').value = '';
+        search(); // Trigger the search function to update the results
+    }
+  
+             function search() {
+            // Getting user input for each criteria
+            var patientName = document.getElementById('search-patientName').value.toLowerCase();
+            var id = document.getElementById('search-id').value.toLowerCase();
+            var email = document.getElementById('search-email').value.toLowerCase();
+            
+            // Getting table rows
+            var rows = document.querySelectorAll('tbody tr');
+
+            // Looping through table rows
+            for (var i = 0; i < rows.length; i++) {
+                var row = rows[i];
+                var rowPatientName = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+                var rowId = row.querySelector('td:nth-child(1)').textContent.toLowerCase();
+                var rowEmail = row.querySelector('td:nth-child(4)').textContent.toLowerCase();
+
+                // Checking if the row matches all input criteria
+                if (rowPatientName.includes(patientName) && rowId.includes(id) && rowEmail.includes(email)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none'; // Hiding the row
+                }
+            }
+        }   
+    </script> 	  
+ </body>
 </html>

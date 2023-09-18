@@ -13,7 +13,6 @@ import com.saurabh.dp.repository.UserRepository;
 
 
 
-
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
     
@@ -22,7 +21,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 	@Autowired
 	private UserRepository userRepo;
 	
-
 	
 	@Override
 	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException{
@@ -30,16 +28,18 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 		// Fetching the user details based on the email
 		UserDtls user = userRepo.findByEmail(email);
 		
-		// if email exist creating a new object
+		// If email exist creating a new object
 		if(user != null) {
 			
 			return new CustomUserDetails(user);
 		}
 		
-		// if email doesn't exist msg diaplaying
+		// If email doesn't exist display the following message
 		
 		throw new UsernameNotFoundException("user not available");
 	}
 }
+
+
 
 

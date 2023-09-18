@@ -6,6 +6,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+/* ============== ONLY FOR TESTING AND SELF PRACTICE TO RE-ROUTE TO ANOTHER APP ================== */
+
 @Controller
 @RequestMapping("/tst")
 public class SwitchController {

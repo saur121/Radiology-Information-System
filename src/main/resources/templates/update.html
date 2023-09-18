@@ -1,5 +1,4 @@
 
-
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
@@ -190,6 +189,11 @@ button:hover {
 		<input type = "hidden" th:field = "*{id}">
 		
 			 <h2>Update Patient Details</h2>
+	
+	      <th:block th:if="${session.msg}">
+        <p class="text-center fs-4 text-success custom">[[${session.msg}]]</p>
+        <th:block th:text="${#session.removeAttribute('msg')}"></th:block>  
+      </th:block> 
 		
       <div class="input-field">
         <input type="text" name="patientName" th:field="*{patientName}" required>

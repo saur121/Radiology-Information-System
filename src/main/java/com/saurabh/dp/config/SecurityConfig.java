@@ -20,7 +20,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity // Enabling web security features
 public class SecurityConfig extends WebSecurityConfigurerAdapter{
    
-	/*  New code */
 	
 	// Loading user-specific data during authentication
 

@@ -37,7 +37,7 @@ public class DataServiceImpl implements DataService {
 		this.dataRepo = dataRepo;
 	}
 	
-	/*  Directory to store the file Path */
+	/*  Directory to store the file */
 	
 	private final String UPLOAD_DIR = "D:\\Image";
 	
@@ -120,6 +120,7 @@ public class DataServiceImpl implements DataService {
 	    				Attributes res = dis.readDataset();
                        
                         
+	    				
 	    				data.setMName(res.getString(org.dcm4che3.data.Tag.PatientName));
 	    				System.out.println(res.getString(org.dcm4che3.data.Tag.PatientName));
 	    				
@@ -142,7 +143,6 @@ public class DataServiceImpl implements DataService {
 	    				 data.setUploadDate(uploadDate);
 	    				 data.setFilePath(filePath.toString());
 	    				 
-	    				 /* 24 - 08 - 2023 */
 	    				 data.setFile(file);
 	    				 /* ... */
 	    				 
@@ -163,23 +163,4 @@ public class DataServiceImpl implements DataService {
 	    	return dataRepo.findByPatientName(patientName);
 	    }
 
-	    /*   For Downloading File */
-	 /*   public ResponseEntity<Resource> downloadFile(int id){
-	        DataDtls data = getDataById(id);
-	        
-	        if(data != null && data.isFileUploaded()) {
-	        	ByteArrayResource resource = new ByteArrayResource(data.getFileData());
-	        	HttpHeaders headers = new HttpHeaders();
-	        	headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + data.getFileName());
-	        	
-	        	return ResponseEntity.ok()
-	        			.headers(headers)
-	        			.contentLength(data.getFileData().length)
-	        			.contentType(MediaType.APPLICATION_OCTET_STREAM)
-	        			.body(resource);
-	        }
-	        else {
-	        	return ResponseEntity.notFound().build();
-	        } 
-	    }    */
 }

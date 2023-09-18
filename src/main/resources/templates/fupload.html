@@ -42,7 +42,7 @@
 <body>
 <div class="container my-2">
   
-    <h1> FILE UPLOAD STATUS</h1>
+    <h1> Dicom Status</h1>
     
     <!-- File Upload form -->
     <form th:action="@{/user/uploadFile/{id}(id=${data.id})}" method="post" enctype="multipart/form-data">
@@ -54,22 +54,26 @@
         </button>
     </form>
     
-    <!-- Display the DICOM image and data side by side -->
+    <!-- Display the DICOM image and data side by side  -->
     <div th:if="${data.fileUploaded}" class="image-data-container">
         <div class="image-container">
             <img th:src="@{/user/test/{id}(id=${data.id})}" alt="DICOM Image">
         </div>
         <div class="data-container">
-            <h2>Dicom File data</h2>
+            <h2>Dicom File Data</h2>
             <table class="table">
                 <tr>
                     <td><strong>Attribute</strong></td>
                     <td><strong>Value</strong></td>
-                </tr>
+                </tr>           
+                
                 <tr>
                     <td><strong>Id</strong></td>
                     <td th:text="${data.mid}"></td>
                 </tr>
+                
+                
+                
                 <tr>
                     <td><strong>Age</strong></td>
                     <td th:text="${data.mage}"></td>
@@ -78,6 +82,13 @@
                     <td><strong>Gender</strong></td>
                     <td th:text="${data.mgender}"></td>
                 </tr>
+                
+                
+                <tr>
+                    <td><strong>Study Upload Date</strong></td>
+                    <td th:text="${data.mstudyDate.substring(0, 4) + '-' + data.mstudyDate.substring(4, 6) + '-' + data.mstudyDate.substring(6)}"></td>
+                </tr>                
+
             </table>
         </div>
     </div>
@@ -86,10 +97,9 @@
         <span class="glyphicon glyphicon-remove"></span> No File Available
     </a>
     
-    <!-- Back button -->
+    <!-- Back button  -->
     <a th:href="@{/user/}" class="btn btn-primary mt-3">Back to Patient List</a>
 </div>
 </body>
 </html>
-
 

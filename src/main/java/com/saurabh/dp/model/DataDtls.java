@@ -56,7 +56,7 @@ public class DataDtls {
 	public MultipartFile file;
  	
  	
- 	/* for metadata*/
+ 	/* ===================== FOR METADATA ==========================*/
     
 	private String mName;
 	
@@ -70,16 +70,5 @@ public class DataDtls {
 
  	  
 }
-/*	
-	@Lob
-	public byte[] fileData;
-	
-	public void setFile(MultipartFile file) throws IOException{
-        this.file = file;
-        if (file != null && !file.isEmpty()) {
-            this.fileData = file.getBytes();
-        } else {
-            this.fileData = null; // Set fileData to null when no file is uploaded
-        }
-	}    */
+
 

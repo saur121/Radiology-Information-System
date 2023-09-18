@@ -5,7 +5,7 @@ import com.saurabh.dp.model.*;
 
 
 
-// Communicating with the database
+/*   ================= TO COMMUNICATE WITH DATABASE =================== */
 
 public interface UserRepository extends JpaRepository<UserDtls, Integer> {
   

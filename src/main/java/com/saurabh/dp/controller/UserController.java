@@ -43,6 +43,8 @@ import com.saurabh.dp.model.DataDtls;
 import com.saurabh.dp.service.DataService;
 import com.saurabh.dp.service.UserService;
 
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 // Handling the user-related actions for /user   url
 @Controller
 @RequestMapping("/user") // mapping url starting with /user to controller
@@ -66,7 +68,7 @@ public class UserController {
 	@PostMapping("/createData")
 	public String createdata(@ModelAttribute DataDtls data, HttpSession session) throws IOException{
 		
-		
+	  /* ======== GETTING THE CURRENT DATE ============= */
 		LocalDate currentDate = LocalDate.now();
 		
 		LocalDate dateOfBirth = LocalDate.parse(data.getDateOfBirth());
@@ -82,6 +84,19 @@ public class UserController {
 			session.setAttribute("msg", "Email id already exists");
 		}
 		else {
+			
+	        if (data.getContactNumber().length() != 10) {
+	            session.setAttribute("msg", "Phone number must have 10 digits.");
+	            return "redirect:/user/patient";
+	        }
+
+	        // Validate temperature range (assuming a reasonable range)
+	        double temperature = data.getTemperature();
+	        if (temperature < 95.0 || temperature > 105.0) {
+	            session.setAttribute("msg", "Invalid temperature. Please enter a temperature within the range of 95.0°F to 105.0°F.");
+	            return "redirect:/user/patient";
+	        }
+			
 			DataDtls dataDtls = dataService.createData(data);
 			
 			if(dataDtls != null) {
@@ -113,11 +128,36 @@ public class UserController {
 		 return "update";
 	}
 	
-	/*  .... Updation .....*/
+	/*  ==================== FOR UPDATION ====================== */
 	@PostMapping("/update/{id}")
-	public String saveUpdatedData(@PathVariable int id, @ModelAttribute DataDtls data, @RequestParam(name = "action", required = false) String action) {
+	public String saveUpdatedData(@PathVariable int id, @ModelAttribute DataDtls data, @RequestParam(name = "action", required = false) String action, HttpSession session) {
+		
+		
 		 
 		if("save".equals(action)) {
+			
+			LocalDate currentDate = LocalDate.now();
+			
+			LocalDate dateOfBirth = LocalDate.parse(data.getDateOfBirth());
+			
+			if(dateOfBirth.isAfter(currentDate)) {
+	            session.setAttribute("msg", "Invalid Date of Birth. Please choose a valid date.");
+	            return "redirect:/user/update/{id}";
+			}
+			
+	        if (data.getContactNumber().length() != 10) {
+	            session.setAttribute("msg", "Phone number must have 10 digits.");
+	            return "redirect:/user/update/{id}";
+	        }
+
+	        // Validating temperature range (assuming a reasonable range)
+	        double temperature = data.getTemperature();
+	        if (temperature < 95.0 || temperature > 105.0) {
+	            session.setAttribute("msg", "Invalid temperature. Please enter a temperature within the range of 95.0°F to 105.0°F.");
+	            return "redirect:/user/update/{id}";
+	        }
+			
+			
 			dataService.updateData(id, data);
 		}
 		return "redirect:/user/";
@@ -128,13 +168,15 @@ public class UserController {
 		return findPaginated(1, "patientName", "asc", model);
 	}	
 	
-	/* .....  Pagination and Sorting .......*/
+	/* ===================== VIEWING THE PATIENT'S LIST WITH PROPER PAGINATION AND SORTING =============================== */
 	@GetMapping("/page/{pageNo}")
 	public String findPaginated(@PathVariable (value = "pageNo") int pageNo,
 			@RequestParam("sortField") String sortField,
 			@RequestParam("sortDir") String sortDir,
 			Model model) {
-		int pageSize = 10;
+		//int pageSize = 10;
+		 
+		 int pageSize = 5;
 		
 		Page<DataDtls> page = dataService.findPaginated(pageNo, pageSize, sortField, sortDir);
 		List<DataDtls> listData = page.getContent();
@@ -152,16 +194,21 @@ public class UserController {
 		return "view";
 	}
 	
-	/* ... for uploading file ....... */
+	/* ================== FOR UPLOADING THE FILE ================================= */
 	@PostMapping("/uploadFile/{id}")
-	public String uploadFile(@PathVariable int id, @RequestParam("file") MultipartFile file, @RequestParam("uploadDate") String uploadDate) {
-		 
+	public String uploadFile(@PathVariable int id, @RequestParam("file") MultipartFile file, @RequestParam("uploadDate") String uploadDate, RedirectAttributes redirectAttributes) {
+		
+        if (!file.getOriginalFilename().toLowerCase().endsWith(".dcm")) {
+            redirectAttributes.addFlashAttribute("error", "Only .dcm files are allowed.");
+            return "redirect:/user/";
+        }
+	
 		dataService.uploadFile(id, file, uploadDate);
 		
 		return "redirect:/user/";
 	}
 	
-	/* ... for downloading file....
+	/* ================= FOR DOWNLOADING THE FILE =========================
 	@GetMapping("/downloadFile/{id}")
 	public ResponseEntity<Resource> downloadFile(@PathVariable int id){
 		return dataService.downloadFile(id);
@@ -176,14 +223,18 @@ public class UserController {
 		return "fupload";
 	} 	  
 	
+
+/*  =============== ONLY FOR TESTING AND SELF PRACTICE FOR RE-ROUTING TO ANOTHER APP ======================= */
 	
-	/* Re-routing to another app */
-	
-	@GetMapping("/react")
+/*	@GetMapping("/react")
 	public void handleGet(HttpServletResponse response) {
 	    response.setHeader("Location", "http://localhost:3000/");
 	    response.setStatus(302);
 	}
+	
+	
+	
+/*  ================ FOR VIEWING THE DICOM IMAGE ============================== */
 	
 	@GetMapping("/test/{id}")
 	public ResponseEntity<byte[]> getView(@PathVariable int id){
@@ -195,66 +246,46 @@ public class UserController {
 	    File file = new File(inputDicomFilePath);
 	    DicomInputStream dis = new DicomInputStream(file);
 	    Attributes attributes = dis.readDataset();
-	      
-    	ImageInputStream iis = new FileImageInputStream(new File(inputDicomFilePath));
+	    
+	    /* ============== FETCHING THE IMAGE FROM FILE PATH ========================== */
+    	ImageInputStream img = new FileImageInputStream(new File(inputDicomFilePath));
         
         ImageReader reader = ImageIO.getImageReadersByFormatName("DICOM").next();
 
-        reader.setInput(iis);
+        reader.setInput(img);
 
         BufferedImage image = reader.read(0, new ImageReadParam());
         
+        /* Used to convert in Byte array */
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ImageIO.write(image, "png", baos);
+        
+
+       /* =========== CONVERTING IMAGE TO JPEG ============= */
+        
+        ImageIO.write(image, "JPEG", baos);
+        
         byte[] imageBytes = baos.toByteArray();
 
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.IMAGE_PNG);
-
-        // Return the image as part of the HTTP response
+       
         
-//        File outputImageFile = new File("C:\\Tejas\\Dicom data\\output.png");
-//        ImageIO.write(image, "png", outputImageFile);
-//        System.out.println("Image saved ");
+        headers.setContentType(MediaType.IMAGE_JPEG);
 
-        // Close the input stream
-        iis.close();
+        img.close();
         return new ResponseEntity<>(imageBytes, headers, HttpStatus.OK);
 	}
 	catch (Exception e) {
-		// TODO: handle exception
 		e.printStackTrace();
 		 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
          }
 		
-}
+} 
 	
-	/*
+/*  ============== ONLY FOR TESTING FOR CORNERSTONE DICOM VIEWER ================== */
 	@GetMapping("/tst")
 	public String test() {
-		return "tmp";
+		return "dicom";
 	}
-	  */
-	/*  28 - 04 -2023 */
-	
- /*   @GetMapping(value = "/viewDicomFile/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
-    public ResponseEntity<Map<String, Object>> viewDicomFile(@PathVariable int id) {
-        DataDtls data = dataService.getDataById(id);
+	  
 
-        if (data != null && data.isFileUploaded()) {
-            Map<String, Object> response = new HashMap<>();
-            response.put("id", data.getId());
-          //  response.put("dicomFileData", data.getFileData());
-
-            return ResponseEntity.ok()
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + data.getFileName())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(response);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
-    }  */
-    
-    /*    */
 }

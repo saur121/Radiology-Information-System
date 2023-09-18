@@ -1,5 +1,4 @@
 
-
 package com.saurabh.dp.config;
 
 import java.util.Arrays;
@@ -11,7 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import com.saurabh.dp.model.UserDtls;
 
-//  Implementation of the Spring Security Interface
+//  Implementation of the User Details interface provided by the Spring Security.
 public class CustomUserDetails implements UserDetails{
     
 	private UserDtls user;
